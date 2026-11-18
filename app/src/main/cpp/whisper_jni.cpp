@@ -49,7 +49,7 @@ Java_com_orvex_traductor_MainActivity_transcribeAudioNative(
     std::vector<float> pcmf32(body, body + len);
     env->ReleaseFloatArrayElements(audio_data, body, JNI_ABORT);
 
-    // Parámetros optimizados para precisión en diálogos de cine y menor alucinación
+    // Parámetros estables y ágiles restaurados para el modelo tiny.en
     struct whisper_full_params wparams = whisper_full_default_params(WHISPER_SAMPLING_GREEDY);
     wparams.print_realtime   = false;
     wparams.print_progress   = false;
@@ -58,10 +58,9 @@ Java_com_orvex_traductor_MainActivity_transcribeAudioNative(
     wparams.translate        = false;
     wparams.language         = "en";
     wparams.n_threads        = 4;
-    wparams.no_context       = false; // Permitir contexto entre fragmentos continuos
+    wparams.no_context       = true;  // Restaurado para evitar bloqueos en fragmentos
     wparams.single_segment   = false;
-    wparams.audio_ctx        = 768;   // Ventana de contexto ampliada para mejor fluidez
-    wparams.initial_prompt   = "Movie dialogue, conversation:"; // Prompt inicial para guiar a Whisper en cine
+    wparams.audio_ctx        = 512;   // Restaurado al valor ágil original
 
     if (whisper_full(g_ctx, wparams, pcmf32.data(), pcmf32.size()) != 0) {
         LOGE("Fallo al procesar audio con whisper_full");
